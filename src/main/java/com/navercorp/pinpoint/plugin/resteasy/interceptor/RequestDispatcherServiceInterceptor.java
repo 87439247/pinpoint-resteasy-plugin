@@ -37,17 +37,18 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.Set;
 
 public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
     public static final RestEasySyncMethodDescriptor RESTEASY_SYNC_METHOD_DESCRIPTOR = new RestEasySyncMethodDescriptor();
-
+    public static final String Header_Host = "Host" ;  // hostname:port
     private PLogger logger = PLoggerFactory.getLogger(this.getClass());
     private final boolean isDebug = logger.isDebugEnabled();
     private final boolean isTrace = logger.isTraceEnabled();
 
     private final Filter<String> excludeUrlFilter;
-    private final RestEasyRemoteAddressResolver remoteAddressResolver;
+    private final RemoteAddressResolver remoteAddressResolver;
 
     private MethodDescriptor methodDescriptor;
     private TraceContext traceContext;
@@ -94,21 +95,14 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
         }
     }
 
-    public static interface RestEasyRemoteAddressResolver {
-        String resolve(HttpRequest httpRequest, ChannelHandlerContext ctx) ;
-    }
-
-    public static class Bypass implements RestEasyRemoteAddressResolver {
-
+    public static class Bypass implements RemoteAddressResolver<HttpRequest> {
         @Override
-        public String resolve(HttpRequest httpRequest, ChannelHandlerContext ctx) {
-            InetSocketAddress socketAddress = (InetSocketAddress)ctx.getChannel().getRemoteAddress() ;
-            InetAddress inetAddress = socketAddress.getAddress() ;
-            return inetAddress.getCanonicalHostName();  // getCanonicalHostName() - fully qualified domain name for this IP address
+        public String resolve(HttpRequest httpRequest) {
+            return httpRequest.getHttpHeaders().getHeaderString(Header_Host) ;
         }
     }
 
-    public static class RealIpHeaderResolver implements RestEasyRemoteAddressResolver {
+    public static class RealIpHeaderResolver implements RemoteAddressResolver<HttpRequest> {
 
         public static final String X_FORWARDED_FOR = "x-forwarded-for";
         public static final String X_REAL_IP = "x-real-ip";
@@ -130,17 +124,16 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
         }
 
         @Override
-        public String resolve(HttpRequest httpRequest, ChannelHandlerContext ctx) {
+        public String resolve(HttpRequest httpRequest) {
             final HttpHeaders httpHeaders = httpRequest.getHttpHeaders() ;
             final String realIp = httpHeaders.getHeaderString(this.realIpHeaderName);
 
-            final InetSocketAddress socketAddress = (InetSocketAddress)ctx.getChannel().getRemoteAddress() ;
             if (realIp == null || realIp.isEmpty()) {
-                return socketAddress.getAddress().getCanonicalHostName();
+                return httpRequest.getHttpHeaders().getHeaderString(Header_Host);
             }
 
             if (emptyHeaderValue != null && emptyHeaderValue.equalsIgnoreCase(realIp)) {
-                return socketAddress.getAddress().getCanonicalHostName();
+                return httpRequest.getHttpHeaders().getHeaderString(Header_Host);
             }
 
             final int firstIndex = realIp.indexOf(',');
@@ -152,12 +145,13 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
         }
     }
 
-    private Trace createTrace(Object target, Object[] args) {
-        final ChannelHandlerContext ctx = (ChannelHandlerContext)args[0] ;
-        final InetSocketAddress socketAddress = (InetSocketAddress)ctx.getChannel().getRemoteAddress() ;
-        final HttpRequest request = (HttpRequest) args[1];
 
-        final String requestURI = request.getUri().getPath();
+
+    private Trace createTrace(Object target, Object[] args) {
+        final HttpRequest request = (HttpRequest) args[1];
+        final URI absulutePath =  request.getUri().getAbsolutePath() ;
+        final String remoteHost = request.getHttpHeaders().getHeaderString(Header_Host) ;
+        final String requestURI = absulutePath.getPath();
         if (excludeUrlFilter.filter(requestURI)) {
             if (isTrace) {
                 logger.trace("filter requestURI:{}", requestURI);
@@ -172,7 +166,7 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
             // For example, if this transaction invokes rpc call, we can add parameter to tell remote node 'don't sample this transaction'
             final Trace trace = traceContext.disableSampling();
             if (isDebug) {
-                logger.debug("remotecall sampling flag found. skip trace requestUrl:{}, remoteAddr:{}", request.getUri().getRequestUri(), socketAddress.getHostName());
+                logger.debug("remotecall sampling flag found. skip trace requestUrl:{}, remoteAddr:{}", absulutePath.getPath(), absulutePath.getHost());
             }
             return trace;
         }
@@ -183,13 +177,13 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
             final Trace trace = traceContext.continueTraceObject(traceId);
             if (trace.canSampled()) {
                 SpanRecorder recorder = trace.getSpanRecorder();
-                recordRootSpan(recorder, request, ctx);
+                recordRootSpan(recorder, request);
                 if (isDebug) {
-                    logger.debug("TraceID exist. continue trace. traceId:{}, requestUrl:{}, remoteAddr:{}", traceId, request.getUri().getRequestUri(), socketAddress.getHostName());
+                    logger.debug("TraceID exist. continue trace. traceId:{}, requestUrl:{}, remoteAddr:{}", traceId, absulutePath.getPath(), remoteHost);
                 }
             } else {
                 if (isDebug) {
-                    logger.debug("TraceID exist. camSampled is false. skip trace. traceId:{}, requestUrl:{}, remoteAddr:{}", traceId, request.getUri().getRequestUri(), socketAddress.getHostName());
+                    logger.debug("TraceID exist. camSampled is false. skip trace. traceId:{}, requestUrl:{}, remoteAddr:{}", traceId, absulutePath.getPath(), remoteHost);
                 }
             }
             return trace;
@@ -197,40 +191,39 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
             final Trace trace = traceContext.newTraceObject();
             if (trace.canSampled()) {
                 SpanRecorder recorder = trace.getSpanRecorder();
-                recordRootSpan(recorder, request, ctx);
+                recordRootSpan(recorder, request);
                 if (isDebug) {
-                    logger.debug("TraceID not exist. start new trace. requestUrl:{}, remoteAddr:{}", request.getUri().getRequestUri(), socketAddress.getHostName());
+                    logger.debug("TraceID not exist. start new trace. requestUrl:{}, remoteAddr:{}", absulutePath.getPath(), remoteHost);
                 }
             } else {
                 if (isDebug) {
-                    logger.debug("TraceID not exist. camSampled is false. skip trace. requestUrl:{}, remoteAddr:{}", request.getUri().getRequestUri(), socketAddress.getHostName());
+                    logger.debug("TraceID not exist. camSampled is false. skip trace. requestUrl:{}, remoteAddr:{}", absulutePath.getPath(),remoteHost);
                 }
             }
             return trace;
         }
     }
 
-    private void recordRootSpan(final SpanRecorder recorder, final HttpRequest request, final ChannelHandlerContext ctx) {
+    private void recordRootSpan(final SpanRecorder recorder, final HttpRequest request) {
         // root
         recorder.recordServiceType(RestEasyConstants.RESTEASY);
 
-        final String requestURL = request.getUri().getRequestUri().toString();
+        final URI absulutePath =  request.getUri().getAbsolutePath() ;
+        final String requestURL = absulutePath.getPath();
         recorder.recordRpcName(requestURL);
-        InetSocketAddress inetAddress = (InetSocketAddress)ctx.getChannel().getRemoteAddress() ;
-        final int port = inetAddress.getPort() ;
-        final String endPoint = inetAddress.getAddress().getCanonicalHostName() + ":" + port;
+        final String endPoint = request.getHttpHeaders().getHeaderString(Header_Host);
         recorder.recordEndPoint(endPoint);
 
-        final String remoteAddr = remoteAddressResolver.resolve(request, ctx);
+        final String remoteAddr = remoteAddressResolver.resolve(request);
         recorder.recordRemoteAddress(remoteAddr);
 
         if (!recorder.isRoot()) {
-            recordParentInfo(recorder, request, ctx);
+            recordParentInfo(recorder, request);
         }
         recorder.recordApi(RESTEASY_SYNC_METHOD_DESCRIPTOR);
     }
 
-    private void recordParentInfo(SpanRecorder recorder, HttpRequest request, ChannelHandlerContext ctx) {
+    private void recordParentInfo(SpanRecorder recorder, HttpRequest request) {
         HttpHeaders httpHeaders = request.getHttpHeaders() ;
         String parentApplicationName = httpHeaders.getHeaderString(Header.HTTP_PARENT_APPLICATION_NAME.toString());
         if (parentApplicationName != null) {
@@ -238,8 +231,7 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
             if (host != null) {
                 recorder.recordAcceptorHost(host);
             } else {
-                InetSocketAddress socketAddress = (InetSocketAddress)ctx.getChannel().getRemoteAddress() ;
-                recorder.recordAcceptorHost(socketAddress.getAddress().getCanonicalHostName() + ":" + socketAddress.getPort());
+                recorder.recordAcceptorHost(request.getHttpHeaders().getHeaderString(Header_Host));
             }
             final String type = httpHeaders.getHeaderString(Header.HTTP_PARENT_APPLICATION_TYPE.toString());
             final short parentApplicationType = NumberUtils.parseShort(type, ServiceType.UNDEFINED.getCode());
@@ -347,5 +339,13 @@ public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
     private void deleteTrace(Trace trace, Object target, Object[] args, Object result, Throwable throwable) {
         trace.traceBlockEnd();
         trace.close();
+    }
+
+    private static String extracHostName(String host) {
+        int n = host.indexOf(":") ;
+        if ( n != -1 ) {
+            return host.substring(0, n) ;
+        } else
+            return host ;
     }
 }
