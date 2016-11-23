@@ -8,7 +8,7 @@ to build this repository, then copy the jar to Pinpoint agent's plugins director
 
 # Configuration
 
-Configure the bootstrap main class in pinpoint.cfg
+Configure the bootstrap main class in pinpoint.config
 
 <pre><code>
 ###########################################################
@@ -19,3 +19,4 @@ Configure the bootstrap main class in pinpoint.cfg
 profiler.resteasy.bootstrap.main=org.greg.resteasy.Main
 </code></pre>
 
+See the [Sample Project](https://github.com/auslides/netty-resteasy-spring) for details.
