@@ -1,6 +1,6 @@
 # How to build it
 
-1, First, following the Pinpoint [Installation Guide](https://github.com/naver/pinpoint/blob/master/doc/installation.md) to build Pinpoint, so that your local maven repository has the required pinpoint artifacts (Currently it requires Pinpoint 1.6.0-RC2).
+1, First, following the Pinpoint [Installation Guide](https://github.com/naver/pinpoint/blob/master/doc/installation.md) to build Pinpoint, so that your local maven repository have the required pinpoint artifacts (currently it requires Pinpoint 1.6.0-RC2).
 
 2, Using
       mvn install -Dmaven.test.skip=true
