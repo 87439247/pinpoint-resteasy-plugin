@@ -10,8 +10,7 @@ to build this repository, then copy the jar to Pinpoint agent's plugins director
 
 Configure the bootstrap main class in pinpoint.config
 
-<pre><code>
-###########################################################
+<pre><code>###########################################################
 # resteasy                                                  #
 ###########################################################
 #profiler.resteasy.enable=true
