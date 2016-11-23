@@ -1,0 +1,1 @@
+# pinpoint-resteasy-plugin
