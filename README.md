@@ -1,15 +1,8 @@
 # How to build it
 
-1, First, following the Pinpoint [Installation Guide](https://github.com/naver/pinpoint/blob/master/doc/installation.md) to build Pinpoint, so that your local maven repository have the required pinpoint artifacts (currently it requires Pinpoint 1.6.0-RC2).
+1, Download [pinpoint-resteasy-plugin-1.6.0-RC2.jar](https://github.com/auslides/repository/raw/master/public/pinpoint/pinpoint-resteasy-plugin-1.6.0-RC2.jar), copy the jar file to Pinpoint agent's plugins directory
 
-2, Using
-      mvn install -Dmaven.test.skip=true
-to build this repository, then copy the jar to Pinpoint agent's plugins directory
-
-# Configuration
-
-Configure the bootstrap main class in pinpoint.config
-
+2. Configure the bootstrap main class in pinpoint.config
 <pre><code>###########################################################
 # resteasy                                                  #
 ###########################################################
