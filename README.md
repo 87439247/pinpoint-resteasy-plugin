@@ -1,4 +1,4 @@
-# How to build it
+# Usage
 
 1. Download [pinpoint-resteasy-plugin-1.6.0-RC2.jar](https://github.com/auslides/repository/raw/master/public/pinpoint/pinpoint-resteasy-plugin-1.6.0-RC2.jar), copy the jar file to [Pinpoint agent](https://github.com/naver/pinpoint/releases/download/1.6.0-RC2/pinpoint-agent-1.6.0-RC2.tar.gz)'s plugins directory.
 
