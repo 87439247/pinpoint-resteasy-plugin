@@ -20,17 +20,9 @@ import com.navercorp.pinpoint.common.trace.ServiceType;
 import com.navercorp.pinpoint.common.trace.ServiceTypeFactory;
 
 public final class RestEasyConstants {
-    private RestEasyConstants() {
-    }
+    private RestEasyConstants() {}
 
     public static final String TYPE_NAME = "RESTEASY";
-
     public static final ServiceType RESTEASY = ServiceTypeFactory.of(1910, "RESTEASY", RECORD_STATISTICS);
     public static final ServiceType RESTEASY_METHOD = ServiceTypeFactory.of(1911, "RESTEASY_METHOD");
-
-    public static final String METADATA_TRACE = "trace";
-    public static final String METADATA_ASYNC = "async";
-    public static final String METADATA_ASYNC_TRACE_ID = "asyncTraceId";
-
-    public static final String ATTRIBUTE_PINPOINT_TRACE = "PINPOINT_TRACE";
 }
