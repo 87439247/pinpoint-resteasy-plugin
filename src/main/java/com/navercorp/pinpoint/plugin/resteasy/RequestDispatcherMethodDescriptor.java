@@ -17,8 +17,12 @@ package com.navercorp.pinpoint.plugin.resteasy;
 import com.navercorp.pinpoint.bootstrap.context.MethodDescriptor;
 import com.navercorp.pinpoint.common.trace.MethodType;
 
-public class RestEasySyncMethodDescriptor implements MethodDescriptor{
-
+/**
+ * 
+ * @author jaehong.kim
+ *
+ */
+public class RequestDispatcherMethodDescriptor implements MethodDescriptor {
     private int apiId = 0;
     private int type = MethodType.WEB_REQUEST;
 
@@ -54,7 +58,7 @@ public class RestEasySyncMethodDescriptor implements MethodDescriptor{
 
     @Override
     public String getFullName() {
-        return RestEasySyncMethodDescriptor.class.getName();
+        return RequestDispatcherMethodDescriptor.class.getName();
     }
 
     @Override

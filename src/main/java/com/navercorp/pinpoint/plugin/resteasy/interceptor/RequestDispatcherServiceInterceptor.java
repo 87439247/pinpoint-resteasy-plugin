@@ -26,10 +26,9 @@ import com.navercorp.pinpoint.bootstrap.util.NumberUtils;
 import com.navercorp.pinpoint.bootstrap.util.StringUtils;
 import com.navercorp.pinpoint.common.trace.AnnotationKey;
 import com.navercorp.pinpoint.common.trace.ServiceType;
+import com.navercorp.pinpoint.plugin.resteasy.RequestDispatcherMethodDescriptor;
 import com.navercorp.pinpoint.plugin.resteasy.RestEasyConfiguration;
 import com.navercorp.pinpoint.plugin.resteasy.RestEasyConstants;
-import com.navercorp.pinpoint.plugin.resteasy.RestEasySyncMethodDescriptor;
-import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.ResteasyUriInfo;
 
@@ -41,7 +40,7 @@ import java.net.URI;
 import java.util.Set;
 
 public class RequestDispatcherServiceInterceptor implements AroundInterceptor {
-    public static final RestEasySyncMethodDescriptor RESTEASY_SYNC_METHOD_DESCRIPTOR = new RestEasySyncMethodDescriptor();
+    public static final RequestDispatcherMethodDescriptor RESTEASY_SYNC_METHOD_DESCRIPTOR = new RequestDispatcherMethodDescriptor();
     public static final String Header_Host = "Host" ;  // hostname:port
     private PLogger logger = PLoggerFactory.getLogger(this.getClass());
     private final boolean isDebug = logger.isDebugEnabled();

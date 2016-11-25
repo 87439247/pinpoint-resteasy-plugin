@@ -40,7 +40,7 @@ public class RestEasyDetector implements ApplicationTypeDetector {
     @Override
     public boolean detect(ConditionProvider provider) {
         boolean b = provider.checkMainClass(bootstrapMains);
-        logger.info("*****************RestEasy Detected? " + b) ;
+        logger.info("RestEasy Detected? " + b) ;
         return b;
     }
 }
