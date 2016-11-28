@@ -20,6 +20,7 @@ import com.navercorp.pinpoint.bootstrap.config.ProfilerConfig;
 import com.navercorp.pinpoint.bootstrap.config.SkipFilter;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RestEasyConfiguration {
@@ -27,16 +28,18 @@ public class RestEasyConfiguration {
     private static final String REQUIRED_MAIN_CLASS = "org.jboss.resteasy.plugins.server.netty.NettyJaxrsServer";
 
     private final boolean restEasyEnable;
-    private final List<String> restEasyBootstrapMains;
     private final Filter<String> restEasyExcludeUrlFilter;
     private final String restEasyRealIpHeader;
     private final String resteasyRealIpEmptyValue;
+    private List<String> restEasyBootstrapMains;
 
     public RestEasyConfiguration(ProfilerConfig config) {
         this.restEasyEnable = config.readBoolean("profiler.resteasy.enable", true);
         this.restEasyBootstrapMains = config.readList("profiler.resteasy.bootstrap.main");
-        if ( restEasyBootstrapMains.isEmpty())
+        if ( restEasyBootstrapMains == null || restEasyBootstrapMains.isEmpty()) {
+            restEasyBootstrapMains = new ArrayList<String>();
             restEasyBootstrapMains.add(REQUIRED_MAIN_CLASS) ;
+        }
         final String resteasyExcludeURL = config.readString("profiler.resteasy.excludeurl", "");
         if (!resteasyExcludeURL.isEmpty()) {
             this.restEasyExcludeUrlFilter = new ExcludePathFilter(resteasyExcludeURL);
