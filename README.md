@@ -12,4 +12,4 @@
 profiler.resteasy.bootstrap.main=org.greg.resteasy.Main
 </code></pre>
 
-See the [Sample Project](https://github.com/auslides/netty-resteasy-spring) for details.
+See the sample Project for [reesteasy-netty3](https://github.com/auslides/netty-resteasy-spring) or [reesteasy-netty4](https://github.com/auslides/netty4-resteasy-spring) for details.
