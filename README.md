@@ -7,6 +7,7 @@
 # resteasy                                                  #
 ###########################################################
 #profiler.resteasy.enable=true
+#profiler.resteasy.isnetty4=true
 # Classes for detecting application server type. Comma separated list of fully qualified class names. Wildcard not supported.
 profiler.resteasy.bootstrap.main=org.greg.resteasy.Main
 </code></pre>

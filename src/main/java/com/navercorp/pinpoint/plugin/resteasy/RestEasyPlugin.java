@@ -33,6 +33,8 @@ import com.navercorp.pinpoint.bootstrap.resolver.ConditionProvider;
 
 public class RestEasyPlugin implements ProfilerPlugin, TransformTemplateAware {
     private final PLogger logger = PLoggerFactory.getLogger(this.getClass());
+    private final String netty3ChannelHandlerContextClass = "org.jboss.netty.channel.ChannelHandlerContext" ;
+    private final String netty4ChannelHandlerContextClass = "io.netty.channel.ChannelHandlerContext" ;
     private TransformTemplate transformTemplate;
 
     @Override
@@ -71,9 +73,14 @@ public class RestEasyPlugin implements ProfilerPlugin, TransformTemplateAware {
             public byte[] doInTransform(Instrumentor instrumentor, ClassLoader classLoader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws InstrumentException {
                 InstrumentClass target = instrumentor.getInstrumentClass(classLoader, className, classfileBuffer);
 
+                String channelHandlerContextClass = null ;
+                if ( config.isNetty4() )
+                    channelHandlerContextClass = netty4ChannelHandlerContextClass ;
+                else
+                    channelHandlerContextClass = netty3ChannelHandlerContextClass ;
                 InstrumentMethod handleMethodEditorBuilder = target.getDeclaredMethod(
                         "service",
-                        "org.jboss.netty.channel.ChannelHandlerContext",
+                        channelHandlerContextClass,
                         "org.jboss.resteasy.spi.HttpRequest",
                         "org.jboss.resteasy.spi.HttpResponse",
                         "boolean");

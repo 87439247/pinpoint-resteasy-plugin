@@ -31,9 +31,12 @@ public class RestEasyConfiguration {
     private final String restEasyRealIpHeader;
     private final String resteasyRealIpEmptyValue;
     private List<String> restEasyBootstrapMains;
+    private final boolean netty4 ;
 
     public RestEasyConfiguration(ProfilerConfig config) {
         this.restEasyEnable = config.readBoolean("profiler.resteasy.enable", true);
+        this.netty4 = config.readBoolean("profiler.resteasy.isnetty4", false);
+
         this.restEasyBootstrapMains = config.readList("profiler.resteasy.bootstrap.main");
         if ( restEasyBootstrapMains == null || restEasyBootstrapMains.isEmpty()) {
             restEasyBootstrapMains = new ArrayList<String>();
@@ -68,5 +71,9 @@ public class RestEasyConfiguration {
 
     public String getResteasyRealIpEmptyValue() {
         return resteasyRealIpEmptyValue;
+    }
+
+    public boolean isNetty4() {
+        return netty4;
     }
 }
