@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RestEasyConfiguration {
-    //private static final String REQUIRED_MAIN_CLASS = "avicit.platform6.core.rest.NettyStart";
     private static final String REQUIRED_MAIN_CLASS = "org.jboss.resteasy.plugins.server.netty.NettyJaxrsServer";
 
     private final boolean restEasyEnable;
