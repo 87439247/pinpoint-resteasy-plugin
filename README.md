@@ -1,8 +1,6 @@
-# Usage
+1. This is [pinpoint](https://github.com/naver/pinpoint) plugin for Jboss' Resteasy (backended by Netty 3/4).
 
-1. Download [pinpoint-resteasy-plugin-1.6.0-RC2.jar](https://github.com/auslides/repository/raw/master/public/pinpoint/pinpoint-resteasy-plugin-1.6.0-RC2.jar), copy the jar file to [Pinpoint agent](https://github.com/naver/pinpoint/releases/download/1.6.0-RC2/pinpoint-agent-1.6.0-RC2.tar.gz)'s /plugins, [Pinpoint Collector](https://github.com/naver/pinpoint/releases/download/1.6.0-RC2/pinpoint-collector-1.6.0-RC2.war)'s WEB-INF/lib and [Pinpoint Web](https://github.com/naver/pinpoint/releases/download/1.6.0-RC2/pinpoint-web-1.6.0-RC2.war)'s WEB-INF/lib directories. 
-
-2. Configure the bootstrap main class in pinpoint.config
+2. Configure the bootstrap main class in pinpoint.config. For resteasy-netty4, set profiler.resteasy.isnetty to true.
 <pre><code>###########################################################
 # resteasy                                                  #
 ###########################################################
@@ -11,5 +9,6 @@
 # Classes for detecting application server type. Comma separated list of fully qualified class names. Wildcard not supported.
 profiler.resteasy.bootstrap.main=org.greg.resteasy.Main
 </code></pre>
-
 See the sample project for [resteasy-netty 3](https://github.com/auslides/netty-resteasy-spring) or [resteasy-netty 4](https://github.com/auslides/netty4-resteasy-spring) for details.
+
+3. For displaying the proper resteasy icons on the server map, the related icons in the images directory must be configured for Pinpoint Web, see ["4, Adding Images"](https://github.com/naver/pinpoint/wiki/Pinpoint-Plugin-Developer-Guide#4-adding-images) in [Pinpoint Plugin Developer Guide](https://github.com/naver/pinpoint/wiki/Pinpoint-Plugin-Developer-Guide). To easy the work, we build  [one](https://github.com/auslides/repository/raw/master/public/pinpoint/pinpoint-web-1.6.0-RC2.war) .
