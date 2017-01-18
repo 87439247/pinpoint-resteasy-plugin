@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.navercorp.pinpoint</groupId>
         <artifactId>pinpoint</artifactId>
-        <version>1.6.0-RC2</version>
+        <version>1.6.0</version>
     </parent>
 
     <artifactId>pinpoint-resteasy-plugin</artifactId>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-netty</artifactId>
-            <version>3.0.9.Final</version>
+            <version>3.0.19.Final</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
